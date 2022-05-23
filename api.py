@@ -1,4 +1,5 @@
-from flask import Flask
+
+from flask import Flask,jsonify
 from util import Preprocessing
 
 preprocess = Preprocessing("model.h5")
@@ -10,7 +11,8 @@ def index():
   
 @app.route('/predict', methods=['GET'])
 def predict():
-  return preprocess.predict()
+  data = {'success': 'true','data': preprocess.predict()}                                                                                                                                                                                                                                                 
+  return jsonify(data)
 
 
 if __name__ == '__main__':

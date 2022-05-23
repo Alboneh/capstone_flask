@@ -1,0 +1,17 @@
+from fastapi import FastAPI
+import json
+import pandas as pd
+import os
+import numpy as np
+import uvicorn
+from util import Preprocessing
+
+app = FastAPI()
+preprocess = Preprocessing("model.h5")
+
+@app.get("/predict")
+def predict():
+    return preprocess.predict()
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,12 +1,15 @@
+import os
 from datetime import timedelta
 from flask import Flask,jsonify,request,make_response
 from util import Preprocessing
 from flask_jwt_extended import JWTManager,create_access_token,jwt_required,get_jwt_identity
 from database import init,getalluser,registerdb,logindb
+from flask_cors import CORS
 
 
 preprocess = Preprocessing("model.h5")
 app = Flask(__name__)
+CORS(app)
 mysql = init(app)
 
 #JWT
@@ -51,7 +54,7 @@ def login():
     return jsonify({"msg": "username atau password salah"}), 401
 
 if __name__ == '__main__':
-    app.run(port=3000)
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 3000)))
     
 
 #@app.route('/predict', methods=['POST'])

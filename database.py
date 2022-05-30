@@ -2,10 +2,13 @@ from flask import jsonify
 from flask_mysqldb import MySQL
 
 def init(app):
-    app.config['MYSQL_HOST'] = 'sql3.freemysqlhosting.net'
-    app.config['MYSQL_USER'] = 'sql3495739'
-    app.config['MYSQL_PASSWORD'] = 'j1mVz9yyIT'
-    app.config['MYSQL_DB'] = 'sql3495739'
+
+    
+    app.config['MYSQL_HOST'] = '34.134.181.229'
+    #app.config['MYSQL_UNIX_SOCKET'] = '/cloudsql/sharp-starlight-351610:us-central1:capstone-data'
+    app.config['MYSQL_USER'] = 'capstone-data'
+    app.config['MYSQL_PASSWORD'] = 'capstonebangkit80'
+    app.config['MYSQL_DB'] = 'flask-data'
     app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
     return MySQL(app)
 

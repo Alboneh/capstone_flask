@@ -32,58 +32,81 @@ def index():
 def login():
     email = request.form['email']
     pwd = request.form['password']
-    user = logindb(mysql,email,pwd)
-    if user != "":
-        access_token = create_access_token(identity=email)
-        data = {"message": "Login Successful" , "user": user, "access_token" : access_token}
-        return jsonify(data),200
-    return jsonify({"msg": "username atau password salah"}), 401
+    try:
+        user = logindb(mysql,email,pwd)
+        if user != "":
+            access_token = create_access_token(identity=email)
+            data = {"message": "Login Successful" , "user": user, "access_token" : access_token}
+            return jsonify(data),200
+        return jsonify({"msg": "username atau password salah"}), 401
+    except Exception as e:
+         err = jsonify(msg=f'{e}')
+         return err
 
 @app.route('/predict', methods=['GET'])
 @jwt_required()
 def predict():
-  data = {'success': 'true','data': prediction_results}                                                                                                                                                                                                                                                 
-  return jsonify(data)
+    try:
+        data = {'success': 'true','data': prediction_results}                                                                                                                                                                                                                                                 
+        return jsonify(data)
+    except Exception as e:
+         err = jsonify(msg=f'{e}')
+         return err
 
 @app.route("/predict/<product_name>", methods=['GET'])
-def predictByProductName(product_name, days: Union[int, None] = None):
+@jwt_required()
+def predictByProductName(product_name):
     try:
-        data = next(product for product in prediction_results if product["product_name"] == product_name)
-    except:
-        return jsonify(status_code=404, content = {"message": f"Product '{product_name}' doesn\'t exist"})
-
-    if (days):
-        data["predictions"] = data["predictions"][:days]
+        try:
+            data = next(product for product in prediction_results if product["product_name"] == product_name)
+        except:
+            return jsonify(status_code=404, content = {"message": f"Product '{product_name}' doesn\'t exist"})
+        days = request.args.get('days', type = int)
+        if (days != None):
+            newdata = data["predictions"][:days]
+            return jsonify(predictions=newdata)
         return data
-    return data
+    except Exception as e:
+         err = jsonify(msg=f'{e}')
+         return err
 
 @app.route("/<product_name>", methods=['POST'])
+@jwt_required()
 def input_product(product_name):
-    input_date = request.form['input_date']
-    sold = request.form['sold']
     try:
-        data = next(product for product in prediction_results if product["product_name"] == product_name)
-    except:
-        return jsonify(status_code=404, content = {"message": f"Product '{product_name}' doesn\'t exist"})
-    
-    prediction = next(item for item in data["predictions"] if item["date"] == input_date)
-    prediction["real"] = sold
-    return data
-
-
-
+        input_date = str(request.form['input_date'])
+        sold = float(request.form['sold'])
+        try:
+            data = next(product for product in prediction_results if product["product_name"] == product_name)
+        except:
+            return jsonify(status_code=404, content = {"message": f"Product '{product_name}' doesn\'t exist"})
+        
+        prediction = next(item for item in data["predictions"] if item["date"] == input_date)
+        prediction["real"] = sold
+        return data
+    except Exception as e:
+         err = jsonify(msg=f'{e}')
+         return err
 
 @app.route('/register', methods=['POST'])
 def register():
     username = request.form['name']
     email = request.form['email']
     pwd = request.form['password']
-    return registerdb(mysql,username,email, pwd)
+    try:
+        return registerdb(mysql,username,email, pwd)
+    except Exception as e:
+         err = jsonify(msg=f'{e}')
+         return err
  
 @app.route('/users',methods=['GET'])
 def userlist():
-    user = getalluser(mysql)
-    return jsonify(user)
+    try:
+        user = getalluser(mysql)
+        return jsonify(user)
+    except Exception as e:
+         err = jsonify(msg=f'{e}')
+         return err
 
 
 if __name__ == '__main__':
